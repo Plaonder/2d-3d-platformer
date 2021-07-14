@@ -68,6 +68,19 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
+
+    private bool Behind3DWall()
+    {
+        if(Physics.CapsuleCast(transform.position + Vector3.up * 0.5f, transform.position - Vector3.up * 0.5f, 0.5f, Vector3.forward * -1, 100, groundMask))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -86,10 +99,13 @@ public class PlayerMovement : MonoBehaviour
             Jump();
         }
 
-        if(Input.GetKeyDown(KeyCode.Q))
+        ControlDrag();
+        ControlSpeed();
+
+        if (Input.GetKeyDown(GameManager.switchKey))
         {
-            GameManager.is3D = !GameManager.is3D;
-            if(GameManager.is3D)
+            Behind3DWall();
+            if (GameManager.is3D)
             {
                 SwitchTo3D();
             }
@@ -99,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if(GameManager.is3D)
+        if (GameManager.is3D)
         {
             When3D();
         }
@@ -107,10 +123,6 @@ public class PlayerMovement : MonoBehaviour
         {
             When2D();
         }
-
-        ControlDrag();
-        ControlSpeed();
-
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
     }
 
@@ -127,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
     void SwitchTo2D()
     {
         savedZPos = transform.position.z;
-        if(!Physics.Raycast(transform.position, Vector3.forward * -1, 100, groundMask))
+        if(!Behind3DWall())
         {
             rb.velocity = Vector3.zero;
             transform.position = new Vector3(transform.position.x, transform.position.y, zPos2d);
@@ -143,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
 
     void When2D()
     {
-        if(wallDetected && !Physics.Raycast(transform.position, Vector3.forward * -1, 100, groundMask))
+        if(wallDetected && !Behind3DWall())
         {
             print("There is no longer a wall detected");
             transform.position = new Vector3(transform.position.x, transform.position.y, zPos2d);

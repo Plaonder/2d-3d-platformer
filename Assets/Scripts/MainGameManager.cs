@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class MainGameManager : MonoBehaviour
 {
-    [SerializeField] bool is3D;
-
+    public KeyCode switchKey;
     // Update is called once per frame
     void Update()
     {
-        GameManager.is3D = is3D;
+        GameManager.switchKey = switchKey;
+        if(Input.GetKeyDown(GameManager.switchKey))
+        {
+            GameManager.is3D = !GameManager.is3D;
+        }
     }
 }
