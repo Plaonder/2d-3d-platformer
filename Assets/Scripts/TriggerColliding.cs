@@ -7,9 +7,6 @@ public class TriggerColliding : MonoBehaviour
     [Header("Trigger Collider")]
     public Collider triggerCollider;
 
-    [Header("Player Tag")]
-    public string playerTag = "Player";
-
     public bool isTriggerColliding;
 
     private void Start()
@@ -20,7 +17,7 @@ public class TriggerColliding : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         print("I am inside of a trigger");
-        if (other.gameObject.CompareTag(playerTag))
+        if (other.gameObject.CompareTag(GameManager.playerTag) || other.gameObject.CompareTag(GameManager.cubeTag))
         {
             isTriggerColliding = true;
         }
@@ -29,7 +26,7 @@ public class TriggerColliding : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         print("I am exiting a trigger");
-        if (other.gameObject.CompareTag(playerTag))
+        if (other.gameObject.CompareTag(GameManager.playerTag) || other.gameObject.CompareTag(GameManager.cubeTag))
         {
             isTriggerColliding = false;
         }

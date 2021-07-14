@@ -44,3 +44,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   switchKey: 9
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 512
+  playerTag: Player
+  cubeTag: Cube

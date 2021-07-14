@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5459590379338856901}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.667, z: 0}
+  m_LocalPosition: {x: 0, y: -0.819, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5459590380665062916}
@@ -166,7 +166,4 @@ MonoBehaviour:
   groundDrag: 6
   airDrag: 2
   groundCheck: {fileID: 5459590379338856900}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 512
   groundDistance: 0.4

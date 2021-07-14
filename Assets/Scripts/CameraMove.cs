@@ -11,6 +11,7 @@ public class CameraMove : MonoBehaviour
     public float camHeight3d;
 
     public float cameraOffset;
+    public float cameraOffset3d;
 
     public Camera cam;
 
@@ -25,18 +26,25 @@ public class CameraMove : MonoBehaviour
         {
             cam.orthographic = false;
 
-            Vector3 targetPosition = playerTransform.position + (Vector3.right * cameraOffset) + (Vector3.up * camHeight3d);
+            float zAdjust = playerTransform.position.z + cameraOffset;
 
-            var rotation = Quaternion.Euler(0, 90, 0); // this adds a 90 degrees Y rotation
+            Vector3 targetPosition = playerTransform.position + (Vector3.up * camHeight3d) + (Vector3.right * cameraOffset3d);
 
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotateSpeed);
-            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * cameraSpeed);
+            //find the vector pointing from our position to the target
+            Vector3 _direction = (playerTransform.position - transform.position).normalized;
+
+            //create the rotation we need to be in to look at the target
+            Quaternion _lookRotation = Quaternion.LookRotation(_direction);
+
+            //rotate us over time according to speed until we are in the required rotation
+            transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, cameraSpeed);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, cameraSpeed);
         }
         else
         {
             cam.orthographic = true;
 
-            Vector3 targetPosition = playerTransform.position + Vector3.forward * cameraOffset;
+            Vector3 targetPosition = new Vector3(playerTransform.position.x, playerTransform.position.y, cameraOffset);
 
             var rotation = Quaternion.Euler(0, 0, 0); // this resets the y rotation
 

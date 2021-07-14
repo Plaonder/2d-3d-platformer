@@ -37,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Ground Detection")]
     public Transform groundCheck;
-    public LayerMask groundMask;
     public float groundDistance = 0.4f;
     bool isGrounded;
 
@@ -71,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool Behind3DWall()
     {
-        if(Physics.CapsuleCast(transform.position + Vector3.up * 0.5f, transform.position - Vector3.up * 0.5f, 0.5f, Vector3.forward * -1, 100, groundMask))
+        if (Physics.CapsuleCast(transform.position + Vector3.up * 0.5f, transform.position - Vector3.up * 0.5f, 0.5f, Vector3.forward * -1, 100, GameManager.groundMask))
         {
             return true;
         }
@@ -86,11 +85,13 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        SwitchTo2D();
     }
 
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, GameManager.groundMask);
 
         PlayerInput();
 
@@ -102,9 +103,13 @@ public class PlayerMovement : MonoBehaviour
         ControlDrag();
         ControlSpeed();
 
+        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+    }
+
+    void LateUpdate()
+    {
         if (Input.GetKeyDown(GameManager.switchKey))
         {
-            Behind3DWall();
             if (GameManager.is3D)
             {
                 SwitchTo3D();
@@ -123,7 +128,6 @@ public class PlayerMovement : MonoBehaviour
         {
             When2D();
         }
-        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
     }
 
     void FixedUpdate()
@@ -133,19 +137,21 @@ public class PlayerMovement : MonoBehaviour
 
     void SwitchTo3D()
     {
-        transform.position = new Vector3(transform.position.x, transform.position.y, savedZPos);
+        SetPlayerLocation(new Vector3(transform.position.x, transform.position.y, savedZPos), false);
     }
 
     void SwitchTo2D()
     {
+        print($"Saving z pos, current z pos is {transform.position.z}");
         savedZPos = transform.position.z;
-        if(!Behind3DWall())
+        if (!Behind3DWall())
         {
             rb.velocity = Vector3.zero;
-            transform.position = new Vector3(transform.position.x, transform.position.y, zPos2d);
+            SetPlayerLocation(new Vector3(transform.position.x, transform.position.y, zPos2d), false);
             wallDetected = false;
             print("No wall, all good");
-        } else
+        }
+        else
         {
             print("AHHH THERE'S A WALL HERE");
             wallDetected = true;
@@ -155,19 +161,19 @@ public class PlayerMovement : MonoBehaviour
 
     void When2D()
     {
-        if(wallDetected && !Behind3DWall())
+        if (wallDetected && !Behind3DWall())
         {
             print("There is no longer a wall detected");
-            transform.position = new Vector3(transform.position.x, transform.position.y, zPos2d);
+            SetPlayerLocation(new Vector3(transform.position.x, transform.position.y, zPos2d), false);
             wallDetected = false;
         }
         else if (!wallDetected)
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, zPos2d);
+            SetPlayerLocation(new Vector3(transform.position.x, transform.position.y, zPos2d), false);
         }
         else
         {
-            transform.position = new Vector3(transform.position.x, transform.position.y, savedZPos);
+            SetPlayerLocation(new Vector3(transform.position.x, transform.position.y, savedZPos), false);
         }
     }
 
@@ -212,6 +218,7 @@ public class PlayerMovement : MonoBehaviour
         verticalMovement = Input.GetAxisRaw("Vertical");
 
         moveDirection = camTransform.forward * verticalMovement + camTransform.right * horizontalMovement;
+        moveDirection = Vector3.ProjectOnPlane(moveDirection, Vector3.up);
     }
 
     void ControlSpeed()
@@ -240,10 +247,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void SetPlayerLocation(Vector3 location)
+    public void SetPlayerLocation(Vector3 location, bool stopVelocity)
     {
         transform.position = location;
-        rb.velocity = Vector3.zero;
+        if(stopVelocity)
+        {
+            rb.velocity = Vector3.zero;
+        }
         Debug.Log("Teleporting player to " + location);
     }
 }
