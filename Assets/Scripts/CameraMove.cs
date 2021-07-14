@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,14 +25,12 @@ public class CameraMove : MonoBehaviour
         {
             cam.orthographic = false;
 
-            float zAdjust = playerTransform.position.z + cameraOffset;
-
             Vector3 targetPosition = playerTransform.position + (Vector3.right * cameraOffset) + (Vector3.up * camHeight3d);
 
             var rotation = Quaternion.Euler(0, 90, 0); // this adds a 90 degrees Y rotation
 
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * rotateSpeed);
-            transform.position = Vector3.Lerp(transform.position, targetPosition, cameraSpeed);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * cameraSpeed);
         }
         else
         {
