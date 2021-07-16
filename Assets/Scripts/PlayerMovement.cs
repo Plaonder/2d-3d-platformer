@@ -86,6 +86,8 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
+        GameManager.is3D = false;
+
         SwitchTo2D();
     }
 

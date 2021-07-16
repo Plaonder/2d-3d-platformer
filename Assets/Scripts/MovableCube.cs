@@ -14,6 +14,8 @@ public class MovableCube : MonoBehaviour
 
     bool wallDetected;
 
+    public bool startBehindWall;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -24,7 +26,11 @@ public class MovableCube : MonoBehaviour
 
     private bool Behind3DWall()
     {
-        if (Physics.Raycast(transform.position, Vector3.back, 100, GameManager.groundMask) || Physics.Raycast(transform.position, Vector3.back, 100, playerMask))
+        if (Physics.Raycast(transform.position, Vector3.back, 100, GameManager.groundMask) || Physics.Raycast(transform.position, Vector3.back, 100, playerMask) && !startBehindWall)
+        {
+            return true;
+        }
+        else if (startBehindWall)
         {
             return true;
         }
@@ -60,6 +66,7 @@ public class MovableCube : MonoBehaviour
 
     void SwitchTo3D()
     {
+        startBehindWall = false;
         SetCubeLocation(new Vector3(transform.position.x, transform.position.y, savedZPos), false);
     }
 
